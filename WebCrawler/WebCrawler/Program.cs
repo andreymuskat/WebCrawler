@@ -40,7 +40,7 @@ namespace WebCrawler
                     games.Add(game);
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
