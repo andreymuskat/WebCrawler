@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 namespace WebCrawler
 {
@@ -11,7 +10,7 @@ namespace WebCrawler
             Console.ReadLine();
         }
 
-        private static async Task startCrawlerAsync()
+        private static async Task<List<GameEntity>> startCrawlerAsync()
         {
             var url = "https://tesera.ru/location/russia/moscow/wants/";
             var httpCLient = new HttpClient();
@@ -19,7 +18,7 @@ namespace WebCrawler
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
 
-            var games = new List<Game>();
+            var games = new List<GameEntity>();
 
 
             var divs = htmlDocument.DocumentNode.Descendants("div")
@@ -29,12 +28,11 @@ namespace WebCrawler
             {
                 foreach (var div in divs)
                 {
-                    var game = new Game()
+                    var game = new GameEntity()
                     {
                         NameGame = div.SelectSingleNode("//h3/a").InnerText,
                         NameAuthor = div.Descendants("a").First(x => x.Attributes["class"] != null && x.Attributes["class"].Value == "spic").InnerText,
                         Rating = div.Descendants("span").FirstOrDefault().InnerText,
-                        ImageUrl = div.Descendants("img").FirstOrDefault().ChildAttributes("src").FirstOrDefault().Value,
                         Link = div.Descendants("a").FirstOrDefault().ChildAttributes("href").FirstOrDefault().Value,
                     };
                     games.Add(game);
@@ -44,6 +42,8 @@ namespace WebCrawler
             {
                 Console.WriteLine(ex.Message);
             }
+
+            return games;
         }
     }
 }
