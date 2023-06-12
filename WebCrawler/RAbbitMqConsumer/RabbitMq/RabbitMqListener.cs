@@ -21,15 +21,17 @@ public class RabbitMqListener : BackgroundService
         _channel.QueueDeclare(queue: "game_tasks", durable: false, exclusive: false, autoDelete: false, arguments: null);
 
         var consumer = new EventingBasicConsumer(_channel);
-        consumer.Received += (model, ea) =>
+        consumer.Received += async (model, ea) =>
         {
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
 
-            var game = JsonConvert.DeserializeObject<GameNamesEntity>(message);
+            var gameLink = JsonConvert.DeserializeObject<GameLinkEntity>(message);
 
             // Обработка полученной задачи
-            ProcessGame(game);
+            var crawler = new CrawlerRepository();
+
+            var games = await crawler.getDescriptionGame(gameLink.Link);
 
             _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         };
@@ -37,12 +39,6 @@ public class RabbitMqListener : BackgroundService
         _channel.BasicConsume(queue: "game_tasks", autoAck: false, consumer: consumer);
 
         return Task.CompletedTask;
-    }
-
-    private void ProcessGame(GameNamesEntity game)
-    {
-
-        Console.WriteLine($"Received Game: {game.NameGame}, Author: {game.NameAuthor}");
     }
 
     public override void Dispose()
