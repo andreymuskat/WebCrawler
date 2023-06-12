@@ -102,6 +102,7 @@ namespace WebCrawler
 
                     gameDescription = new GameDescriptionEntity()
                     {
+                        NameGame = obj.SelectSingleNode("//span[@itemprop='name']").InnerText,
                         NameAuther = obj.Descendants("span")
                                         .FirstOrDefault(x => x.Attributes["itemprop"] != null && x.Attributes["itemprop"].Value == "author")?
                                         .InnerText,
