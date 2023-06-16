@@ -15,7 +15,7 @@ namespace RAbbitMqConsumer.Controllers
             _elasticClient = elasticClient;
         }
 
-        [HttpGet(Name = "GetAllProducts")]
+        [HttpGet(Name = "GetAllGames")]
         public async Task<IActionResult> Get(string keyword)
         {
             var result = await _elasticClient.SearchAsync<GameDescriptionEntity>(
@@ -26,6 +26,25 @@ namespace RAbbitMqConsumer.Controllers
 
             return Ok(result.Documents.ToList());
         }
+
+        //[HttpGet(Name = "GetDuplicate")]
+        //public async Task<IActionResult> GetDuplicate(string keyword)
+        //{
+        //    var result = await _elasticClient.SearchAsync<GameDescriptionEntity>(
+        //        s => s.Query(q => q
+        //            .Bool(b => b
+        //                .Filter(f => f
+        //                    .Regexp(r => r
+        //                        .Field(fd => fd.Description) /
+        //                        .Value(".*" + keyword + ".*") 
+        //                    )
+        //                )
+        //            )
+        //        )
+        //        .Size(5000));
+
+        //    return Ok(result.Documents.ToList());
+        //}
 
         [HttpPost(Name = "AddGame")]
         public async Task<IActionResult> Post(GameDescriptionEntity game)

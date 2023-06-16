@@ -36,7 +36,7 @@ public class RabbitMqListener : BackgroundService
 
             var game = await crawler.getDescriptionGame(gameLink.Link);
 
-            //await _elasticClient.IndexDocumentAsync(game);
+            await _elasticClient.IndexDocumentAsync(game);
 
             _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         };
