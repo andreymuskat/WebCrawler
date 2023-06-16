@@ -3,17 +3,20 @@ using RabbitMQ.Client;
 using System.Text;
 using Newtonsoft.Json;
 using WebCrawler;
+using Nest;
 
 public class RabbitMqListener : BackgroundService
 {
     private readonly IConnection _connection;
     private readonly IModel _channel;
+    private readonly IElasticClient _elasticClient;
 
-    public RabbitMqListener()
+    public RabbitMqListener(IElasticClient elasticClient)
     {
         var factory = new ConnectionFactory() { HostName = "localhost" };
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
+        _elasticClient = elasticClient;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,7 +34,9 @@ public class RabbitMqListener : BackgroundService
             // Обработка полученной задачи
             var crawler = new CrawlerRepository();
 
-            var games = await crawler.getDescriptionGame(gameLink.Link);
+            var game = await crawler.getDescriptionGame(gameLink.Link);
+
+            //await _elasticClient.IndexDocumentAsync(game);
 
             _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
         };
